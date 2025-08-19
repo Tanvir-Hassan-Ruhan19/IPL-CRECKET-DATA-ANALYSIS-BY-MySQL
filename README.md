@@ -59,3 +59,30 @@ ORDER BY TotalRunsScored DESC;``
 | Sunrisers Hyderabad         | 1065            |
 
 
+## 3.Find players who have scored more runs than the average total runs of all players.
+``SELECT 
+PlayerName,
+ TotalRuns 
+FROM TotalScores TS
+JOIN Players P ON TS.PlayerID = P.PlayerID
+WHERE TS.TotalRuns > (SELECT AVG(TotalRuns) FROM TotalScores);``
+
+## Output:
+
+| PlayerName     | TotalRuns |
+| -------------- | --------- |
+| Michael Hussey | 733       |
+| Suresh Raina   | 548       |
+| MS Dhoni       | 461       |
+| Rohit Sharma   | 538       |
+| Dinesh Karthik | 510       |
+| Kieron Pollard | 420       |
+| Ajinkya Rahane | 560       |
+| Shane Watson   | 543       |
+| Sanju Samson   | 350       |
+| Shikhar Dhawan | 475       |
+| Cameron White  | 350       |
+| Chris Gayle    | 708       |
+| Virat Kohli    | 634       |
+| AB de Villiers | 360       |
+| Gautam Gambhir | 486       |
