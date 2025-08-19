@@ -86,3 +86,78 @@ WHERE TS.TotalRuns > (SELECT AVG(TotalRuns) FROM TotalScores);``
 | Virat Kohli    | 634       |
 | AB de Villiers | 360       |
 | Gautam Gambhir | 486       |
+
+
+## 4.Retrieve match details along with the venue where each match was played.
+## CODE:
+``SELECT
+ M.MatchID,
+ M.MatchDate, 
+ T1.TeamName AS Team1, 
+ T2.TeamName AS Team2,
+ V.VenueName, V.City 
+FROM Matches M
+INNER JOIN Teams T1 ON M.Team1ID = T1.TeamID
+INNER JOIN Teams T2 ON M.Team2ID = T2.TeamID
+INNER JOIN Venues V ON M.VenueID = V.VenueID;``
+
+## Output:
+| MatchID | MatchDate  | Team1                       | Team2                       | VenueName                          | City      |
+| ------- | ---------- | --------------------------- | --------------------------- | ---------------------------------- | --------- |
+| 401     | 2013-04-03 | Chennai Super Kings         | Mumbai Indians              | M. A. Chidambaram Stadium          | Chennai   |
+| 404     | 2013-04-09 | Chennai Super Kings         | Rajasthan Royals            | Rajiv Gandhi International Stadium | Hyderabad |
+| 410     | 2013-05-26 | Chennai Super Kings         | Mumbai Indians              | Rajiv Gandhi International Stadium | Hyderabad |
+| 405     | 2013-04-11 | Mumbai Indians              | Sunrisers Hyderabad         | M. Chinnaswamy Stadium             | Bangalore |
+| 408     | 2013-04-17 | Mumbai Indians              | Royal Challengers Bangalore | Wankhede Stadium                   | Mumbai    |
+| 402     | 2013-04-05 | Rajasthan Royals            | Sunrisers Hyderabad         | Wankhede Stadium                   | Mumbai    |
+| 409     | 2013-04-19 | Sunrisers Hyderabad         | Kolkata Knight Riders       | Sawai Mansingh Stadium             | Jaipur    |
+| 403     | 2013-04-07 | Royal Challengers Bangalore | Kolkata Knight Riders       | Sawai Mansingh Stadium             | Jaipur    |
+| 406     | 2013-04-13 | Royal Challengers Bangalore | Chennai Super Kings         | Eden Gardens                       | Kolkata   |
+| 407     | 2013-04-15 | Kolkata Knight Riders       | Rajasthan Royals            | M. A. Chidambaram Stadium          | Chennai   |
+
+
+## 5.Retrieve all players along with their respective teams, even if they do not belong to any team.
+## Code:
+``SELECT 
+P.PlayerName, 
+P.Age, 
+P.Role, 
+T.TeamName 
+FROM Players P
+LEFT JOIN Teams T ON P.TeamID = T.TeamID;``
+
+## Output:
+
+| PlayerName       | Age | Role         | TeamName                    |
+| ---------------- | --- | ------------ | --------------------------- |
+| Michael Hussey   | 38  | Batsman      | Chennai Super Kings         |
+| Suresh Raina     | 26  | Batsman      | Chennai Super Kings         |
+| MS Dhoni         | 31  | Wicketkeeper | Chennai Super Kings         |
+| Dwayne Bravo     | 30  | All-rounder  | Chennai Super Kings         |
+| Ravindra Jadeja  | 25  | All-rounder  | Chennai Super Kings         |
+| Rohit Sharma     | 26  | Batsman      | Mumbai Indians              |
+| Dinesh Karthik   | 28  | Wicketkeeper | Mumbai Indians              |
+| Kieron Pollard   | 26  | All-rounder  | Mumbai Indians              |
+| Mitchell Johnson | 32  | Bowler       | Mumbai Indians              |
+| Lasith Malinga   | 30  | Bowler       | Mumbai Indians              |
+| Ajinkya Rahane   | 25  | Batsman      | Rajasthan Royals            |
+| Shane Watson     | 31  | All-rounder  | Rajasthan Royals            |
+| Sanju Samson     | 19  | Wicketkeeper | Rajasthan Royals            |
+| James Faulkner   | 23  | Bowler       | Rajasthan Royals            |
+| Brad Hodge       | 38  | Batsman      | Rajasthan Royals            |
+| Shikhar Dhawan   | 27  | Batsman      | Sunrisers Hyderabad         |
+| Cameron White    | 30  | Batsman      | Sunrisers Hyderabad         |
+| Darren Sammy     | 30  | All-rounder  | Sunrisers Hyderabad         |
+| Amit Mishra      | 30  | Bowler       | Sunrisers Hyderabad         |
+| Dale Steyn       | 30  | Bowler       | Sunrisers Hyderabad         |
+| Chris Gayle      | 34  | Batsman      | Royal Challengers Bangalore |
+| Virat Kohli      | 24  | Batsman      | Royal Challengers Bangalore |
+| AB de Villiers   | 29  | Batsman      | Royal Challengers Bangalore |
+| Vinay Kumar      | 29  | Bowler       | Royal Challengers Bangalore |
+| Murali Kartik    | 37  | Bowler       | Royal Challengers Bangalore |
+| Gautam Gambhir   | 31  | Batsman      | Kolkata Knight Riders       |
+| Jacques Kallis   | 37  | All-rounder  | Kolkata Knight Riders       |
+| Sunil Narine     | 25  | Bowler       | Kolkata Knight Riders       |
+| Yusuf Pathan     | 30  | All-rounder  | Kolkata Knight Riders       |
+| Manvinder Bisla  | 28  | Wicketkeeper | Kolkata Knight Riders       |
+
