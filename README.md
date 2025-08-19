@@ -23,14 +23,16 @@ FROM Players
 WHERE Role = 'Batsman';
 
 output
-'Michael Hussey', '38', 'Australian'
-'Suresh Raina', '26', 'Indian'
-'Rohit Sharma', '26', 'Indian'
-'Ajinkya Rahane', '25', 'Indian'
-'Brad Hodge', '38', 'Australian'
-'Shikhar Dhawan', '27', 'Indian'
-'Cameron White', '30', 'Australian'
-'Chris Gayle', '34', 'West Indian'
-'Virat Kohli', '24', 'Indian'
-'AB de Villiers', '29', 'South African'
-'Gautam Gambhir', '31', 'Indian'
+| PlayerName     | Age | Nationality   |
+| -------------- | --- | ------------- |
+| Michael Hussey | 38  | Australian    |
+| Suresh Raina   | 26  | Indian        |
+| Rohit Sharma   | 26  | Indian        |
+| Ajinkya Rahane | 25  | Indian        |
+| Brad Hodge     | 38  | Australian    |
+| Shikhar Dhawan | 27  | Indian        |
+| Cameron White  | 30  | Australian    |
+| Chris Gayle    | 34  | West Indian   |
+| Virat Kohli    | 24  | Indian        |
+| AB de Villiers | 29  | South African |
+| Gautam Gambhir | 31  | Indian        |
