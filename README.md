@@ -35,4 +35,4 @@ output
 | Chris Gayle    | 34  | West Indian   |
 | Virat Kohli    | 24  | Indian        |
 | AB de Villiers | 29  | South African |
-| Gautam Gambhir | 31  | Indian        |
+| Gautam Gambhir | 31  | Indian        |```
