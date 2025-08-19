@@ -20,7 +20,7 @@ SELECT
     Age, 
     Nationality 
 FROM Players
-WHERE Role = 'Batsman';
+WHERE Role = 'Batsman';```
 
 output
 | PlayerName     | Age | Nationality   |
