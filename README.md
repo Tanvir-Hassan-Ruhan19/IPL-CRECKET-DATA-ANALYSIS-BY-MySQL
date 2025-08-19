@@ -14,12 +14,14 @@ This project demonstrates a comprehensive IPL (Indian Premier League) database m
   ## SQL Queries & Outputs
 
 ### 1. Retrieve all players who are batsmen
-``SELECT
+```sql
+SELECT
     PlayerName,
     Age, 
     Nationality 
 FROM Players
-WHERE Role = 'Batsman';``
+WHERE Role = 'Batsman';
+```
 
 ## output:
 
@@ -39,14 +41,16 @@ WHERE Role = 'Batsman';``
 
 
 ## 2.Find the total number of runs scored by each team.
-``SELECT 
+```sql
+SELECT 
 T.TeamName, 
 SUM(TS.TotalRuns) AS TotalRunsScored
 FROM TotalScores TS
 JOIN Players P ON TS.PlayerID = P.PlayerID
 JOIN Teams T ON P.TeamID = T.TeamID
 GROUP BY T.TeamName
-ORDER BY TotalRunsScored DESC;``
+ORDER BY TotalRunsScored DESC;
+```
 
 ## Output:
 | TeamName                    | TotalRunsScored |
@@ -60,12 +64,14 @@ ORDER BY TotalRunsScored DESC;``
 
 
 ## 3.Find players who have scored more runs than the average total runs of all players.
-``SELECT 
+```sql
+SELECT 
 PlayerName,
  TotalRuns 
 FROM TotalScores TS
 JOIN Players P ON TS.PlayerID = P.PlayerID
-WHERE TS.TotalRuns > (SELECT AVG(TotalRuns) FROM TotalScores);``
+WHERE TS.TotalRuns > (SELECT AVG(TotalRuns) FROM TotalScores);
+```
 
 ## Output:
 
@@ -89,8 +95,8 @@ WHERE TS.TotalRuns > (SELECT AVG(TotalRuns) FROM TotalScores);``
 
 
 ## 4.Retrieve match details along with the venue where each match was played.
-## CODE:
-``SELECT
+```sql
+SELECT
  M.MatchID,
  M.MatchDate, 
  T1.TeamName AS Team1, 
@@ -99,7 +105,8 @@ WHERE TS.TotalRuns > (SELECT AVG(TotalRuns) FROM TotalScores);``
 FROM Matches M
 INNER JOIN Teams T1 ON M.Team1ID = T1.TeamID
 INNER JOIN Teams T2 ON M.Team2ID = T2.TeamID
-INNER JOIN Venues V ON M.VenueID = V.VenueID;``
+INNER JOIN Venues V ON M.VenueID = V.VenueID;
+```
 
 ## Output:
 | MatchID | MatchDate  | Team1                       | Team2                       | VenueName                          | City      |
@@ -117,14 +124,15 @@ INNER JOIN Venues V ON M.VenueID = V.VenueID;``
 
 
 ## 5.Retrieve all players along with their respective teams, even if they do not belong to any team.
-## Code:
-``SELECT 
+```sql
+SELECT 
 P.PlayerName, 
 P.Age, 
 P.Role, 
 T.TeamName 
 FROM Players P
-LEFT JOIN Teams T ON P.TeamID = T.TeamID;``
+LEFT JOIN Teams T ON P.TeamID = T.TeamID;
+```
 
 ## Output:
 
@@ -162,14 +170,15 @@ LEFT JOIN Teams T ON P.TeamID = T.TeamID;``
 | Manvinder Bisla  | 28  | Wicketkeeper | Kolkata Knight Riders       |
 
 ## 6.Find top 5 players with highest total runs.[using RANK()]
-## Code:
-``SELECT 
+```sql
+SELECT 
 PlayerName,
 TotalRuns, 
 RANK() OVER (ORDER BY TotalRuns DESC) AS RunRank
 FROM TotalScores TS
 JOIN Players P ON TS.PlayerID = P.PlayerID
-LIMIT 5;``
+LIMIT 5;
+```
 
 ## Output:
 
@@ -183,8 +192,9 @@ LIMIT 5;``
 
 
 ## 7.Find top  bowler from each team .[using ROW_NUMBER()]
-## Code:
-``SELECT 
+
+```sql
+SELECT 
 TeamName,
 PlayerName, 
 TotalWickets, 
@@ -192,7 +202,8 @@ ROW_NUMBER() OVER (PARTITION BY TeamName ORDER BY TotalWickets DESC) AS BowlerRa
 FROM TotalScores TS
 JOIN Players P ON TS.PlayerID = P.PlayerID
 JOIN Teams T ON P.TeamID = T.TeamID
-WHERE TotalWickets > 0;``
+WHERE TotalWickets > 0;
+```
 
 ## Output:
 
@@ -214,13 +225,15 @@ WHERE TotalWickets > 0;``
 | Sunrisers Hyderabad         | Darren Sammy     | 10           | 3          |
 
 ## 8.Running total of runs for each player (cumulative)
-## Code:
-``SELECT 
+
+```sql
+SELECT 
 PlayerName,
 TotalRuns,
 SUM(TotalRuns) OVER (ORDER BY TotalRuns DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS RunningTotal
 FROM TotalScores TS
-JOIN Players P ON TS.PlayerID = P.PlayerID;``
+JOIN Players P ON TS.PlayerID = P.PlayerID;
+```
 
 ## Output:
 
@@ -259,8 +272,8 @@ JOIN Players P ON TS.PlayerID = P.PlayerID;``
 
 
 ## 9.Find average runs by role.[using CTE]
-## Code:
-``WITH RoleAvg AS (
+```sql
+WITH RoleAvg AS (
     SELECT
     Role, 
     AVG(TotalRuns) AS AvgRuns
@@ -268,7 +281,8 @@ JOIN Players P ON TS.PlayerID = P.PlayerID;``
     JOIN Players P ON TS.PlayerID = P.PlayerID
     GROUP BY Role
 )
-SELECT * FROM RoleAvg;``
+SELECT * FROM RoleAvg;
+```
 
 ## Output:
 
@@ -281,13 +295,14 @@ SELECT * FROM RoleAvg;``
 
 
 ## 10.Player performance percentile based on runs
-## Code:
-``SELECT
+```sql
+SELECT
 PlayerName, 
 TotalRuns,
 round(PERCENT_RANK() OVER (ORDER BY TotalRuns DESC),2) AS Run_Percentile
 FROM TotalScores TS
-JOIN Players P ON TS.PlayerID = P.PlayerID;``
+JOIN Players P ON TS.PlayerID = P.PlayerID;
+```
 
 ## Output:
 
