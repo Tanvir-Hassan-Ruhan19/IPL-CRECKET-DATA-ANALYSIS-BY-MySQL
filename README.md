@@ -14,8 +14,7 @@ This project demonstrates a comprehensive IPL (Indian Premier League) database m
   ## SQL Queries & Outputs
 
 ### 1. Retrieve all players who are batsmen
-``sql
-SELECT
+``SELECT
     PlayerName,
     Age, 
     Nationality 
