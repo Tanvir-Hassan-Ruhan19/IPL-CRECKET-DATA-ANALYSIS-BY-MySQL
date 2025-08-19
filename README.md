@@ -161,3 +161,173 @@ LEFT JOIN Teams T ON P.TeamID = T.TeamID;``
 | Yusuf Pathan     | 30  | All-rounder  | Kolkata Knight Riders       |
 | Manvinder Bisla  | 28  | Wicketkeeper | Kolkata Knight Riders       |
 
+## 6.Find top 5 players with highest total runs.[using RANK()]
+## Code:
+``SELECT 
+PlayerName,
+TotalRuns, 
+RANK() OVER (ORDER BY TotalRuns DESC) AS RunRank
+FROM TotalScores TS
+JOIN Players P ON TS.PlayerID = P.PlayerID
+LIMIT 5;``
+
+## Output:
+
+| PlayerName     | TotalRuns | RunRank |
+| -------------- | --------- | ------- |
+| Michael Hussey | 733       | 1       |
+| Chris Gayle    | 708       | 2       |
+| Virat Kohli    | 634       | 3       |
+| Ajinkya Rahane | 560       | 4       |
+| Suresh Raina   | 548       | 5       |
+
+
+## 7.Find top  bowler from each team .[using ROW_NUMBER()]
+## Code:
+``SELECT 
+TeamName,
+PlayerName, 
+TotalWickets, 
+ROW_NUMBER() OVER (PARTITION BY TeamName ORDER BY TotalWickets DESC) AS BowlerRank
+FROM TotalScores TS
+JOIN Players P ON TS.PlayerID = P.PlayerID
+JOIN Teams T ON P.TeamID = T.TeamID
+WHERE TotalWickets > 0;``
+
+## Output:
+
+| TeamName                    | PlayerName       | TotalWickets | BowlerRank |
+| --------------------------- | ---------------- | ------------ | ---------- |
+| Chennai Super Kings         | Dwayne Bravo     | 32           | 1          |
+| Chennai Super Kings         | Ravindra Jadeja  | 15           | 2          |
+| Kolkata Knight Riders       | Sunil Narine     | 24           | 1          |
+| Kolkata Knight Riders       | Jacques Kallis   | 10           | 2          |
+| Mumbai Indians              | Mitchell Johnson | 24           | 1          |
+| Mumbai Indians              | Lasith Malinga   | 22           | 2          |
+| Mumbai Indians              | Kieron Pollard   | 10           | 3          |
+| Rajasthan Royals            | James Faulkner   | 28           | 1          |
+| Rajasthan Royals            | Shane Watson     | 13           | 2          |
+| Royal Challengers Bangalore | Vinay Kumar      | 20           | 1          |
+| Royal Challengers Bangalore | Murali Kartik    | 18           | 2          |
+| Sunrisers Hyderabad         | Amit Mishra      | 21           | 1          |
+| Sunrisers Hyderabad         | Dale Steyn       | 19           | 2          |
+| Sunrisers Hyderabad         | Darren Sammy     | 10           | 3          |
+
+## 8.Running total of runs for each player (cumulative)
+## Code:
+``SELECT 
+PlayerName,
+TotalRuns,
+SUM(TotalRuns) OVER (ORDER BY TotalRuns DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS RunningTotal
+FROM TotalScores TS
+JOIN Players P ON TS.PlayerID = P.PlayerID;``
+
+## Output:
+
+| PlayerName       | TotalRuns | RunningTotal |
+| ---------------- | --------- | ------------ |
+| Michael Hussey   | 733       | 733          |
+| Chris Gayle      | 708       | 1441         |
+| Virat Kohli      | 634       | 2075         |
+| Ajinkya Rahane   | 560       | 2635         |
+| Suresh Raina     | 548       | 3183         |
+| Shane Watson     | 543       | 3726         |
+| Rohit Sharma     | 538       | 4264         |
+| Dinesh Karthik   | 510       | 4774         |
+| Gautam Gambhir   | 486       | 5260         |
+| Shikhar Dhawan   | 475       | 5735         |
+| MS Dhoni         | 461       | 6196         |
+| Kieron Pollard   | 420       | 6616         |
+| AB de Villiers   | 360       | 6976         |
+| Sanju Samson     | 350       | 7326         |
+| Cameron White    | 350       | 7676         |
+| Dwayne Bravo     | 312       | 7988         |
+| Jacques Kallis   | 311       | 8299         |
+| Brad Hodge       | 285       | 8584         |
+| Manvinder Bisla  | 230       | 8814         |
+| Yusuf Pathan     | 210       | 9024         |
+| Ravindra Jadeja  | 200       | 9224         |
+| Darren Sammy     | 180       | 9404         |
+| James Faulkner   | 110       | 9514         |
+| Amit Mishra      | 50        | 9564         |
+| Mitchell Johnson | 20        | 9584         |
+| Vinay Kumar      | 20        | 9604         |
+| Dale Steyn       | 10        | 9614         |
+| Lasith Malinga   | 5         | 9619         |
+| Murali Kartik    | 5         | 9624         |
+| Sunil Narine     | 5         | 9629         |
+
+
+## 9.Find average runs by role.[using CTE]
+## Code:
+``WITH RoleAvg AS (
+    SELECT
+    Role, 
+    AVG(TotalRuns) AS AvgRuns
+    FROM TotalScores TS
+    JOIN Players P ON TS.PlayerID = P.PlayerID
+    GROUP BY Role
+)
+SELECT * FROM RoleAvg;``
+
+## Output:
+
+| Role         | AvgRuns  |
+| ------------ | -------- |
+| Batsman      | 516.0909 |
+| Wicketkeeper | 387.7500 |
+| All-rounder  | 310.8571 |
+| Bowler       | 28.1250  |
+
+
+## 10.Player performance percentile based on runs
+## Code:
+``SELECT
+PlayerName, 
+TotalRuns,
+round(PERCENT_RANK() OVER (ORDER BY TotalRuns DESC),2) AS Run_Percentile
+FROM TotalScores TS
+JOIN Players P ON TS.PlayerID = P.PlayerID;``
+
+## Output:
+
+| PlayerName       | TotalRuns | Run\_Percentile |
+| ---------------- | --------- | --------------- |
+| Michael Hussey   | 733       | 0.00            |
+| Chris Gayle      | 708       | 0.03            |
+| Virat Kohli      | 634       | 0.07            |
+| Ajinkya Rahane   | 560       | 0.10            |
+| Suresh Raina     | 548       | 0.14            |
+| Shane Watson     | 543       | 0.17            |
+| Rohit Sharma     | 538       | 0.21            |
+| Dinesh Karthik   | 510       | 0.24            |
+| Gautam Gambhir   | 486       | 0.28            |
+| Shikhar Dhawan   | 475       | 0.31            |
+| MS Dhoni         | 461       | 0.34            |
+| Kieron Pollard   | 420       | 0.38            |
+| AB de Villiers   | 360       | 0.41            |
+| Sanju Samson     | 350       | 0.45            |
+| Cameron White    | 350       | 0.45            |
+| Dwayne Bravo     | 312       | 0.52            |
+| Jacques Kallis   | 311       | 0.55            |
+| Brad Hodge       | 285       | 0.59            |
+| Manvinder Bisla  | 230       | 0.62            |
+| Yusuf Pathan     | 210       | 0.66            |
+| Ravindra Jadeja  | 200       | 0.69            |
+| Darren Sammy     | 180       | 0.72            |
+| James Faulkner   | 110       | 0.76            |
+| Amit Mishra      | 50        | 0.79            |
+| Mitchell Johnson | 20        | 0.83            |
+| Vinay Kumar      | 20        | 0.83            |
+| Dale Steyn       | 10        | 0.90            |
+| Lasith Malinga   | 5         | 0.93            |
+| Murali Kartik    | 5         | 0.93            |
+| Sunil Narine     | 5         | 0.93            |
+
+
+
+
+
+
+
+
