@@ -21,7 +21,7 @@ This project demonstrates a comprehensive IPL (Indian Premier League) database m
 FROM Players
 WHERE Role = 'Batsman';``
 
-##output:
+## output:
 
 | PlayerName     | Age | Nationality   |
 | -------------- | --- | ------------- |
@@ -48,7 +48,7 @@ JOIN Teams T ON P.TeamID = T.TeamID
 GROUP BY T.TeamName
 ORDER BY TotalRunsScored DESC;``
 
-# Output:
+## Output:
 | TeamName                    | TotalRunsScored |
 | --------------------------- | --------------- |
 | Chennai Super Kings         | 2254            |
