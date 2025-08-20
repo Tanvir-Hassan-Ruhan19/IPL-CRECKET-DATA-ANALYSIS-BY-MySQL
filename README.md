@@ -452,7 +452,7 @@ LIMIT 5;
 | Mitchell Johnson | 401     | 2.50    |
 | Amit Mishra      | 402     | 2.50    |
 
-## 15.CTE to calculate teamwise average runs per player
+## 15. Calculate teamwise average runs per player[Using CTE]
 ```sql
 WITH TeamRuns AS (
     SELECT 
