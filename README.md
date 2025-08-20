@@ -340,9 +340,410 @@ JOIN Players P ON TS.PlayerID = P.PlayerID;
 | Sunil Narine     | 5         | 0.93            |
 
 
+## 11.Find match count played by each team
+```sql
+SELECT 
+T.TeamName, 
+COUNT(M.MatchID) AS MatchesPlayed
+FROM Teams T
+JOIN Matches M ON T.TeamID = M.Team1ID OR T.TeamID = M.Team2ID
+GROUP BY T.TeamName;
+```
+## Output:
+
+| TeamName                    | MatchesPlayed |
+| --------------------------- | ------------- |
+| Chennai Super Kings         | 4             |
+| Mumbai Indians              | 4             |
+| Rajasthan Royals            | 3             |
+| Sunrisers Hyderabad         | 3             |
+| Royal Challengers Bangalore | 3             |
+| Kolkata Knight Riders       | 3             |
 
 
 
+## 12.Find top 3 highest run scorers from each team
+``` sql
+SELECT
+TeamName, 
+PlayerName, 
+TotalRuns
+FROM (
+SELECT 
+T.TeamName,
+P.PlayerName, 
+TS.TotalRuns,
+ROW_NUMBER() OVER (PARTITION BY T.TeamName ORDER BY TS.TotalRuns DESC) AS rn
+    FROM TotalScores TS
+    JOIN Players P ON TS.PlayerID = P.PlayerID
+    JOIN Teams T ON P.TeamID = T.TeamID
+) x
+WHERE rn <= 3;
+```
+
+## Output:
+
+| TeamName                    | PlayerName      | TotalRuns |
+| --------------------------- | --------------- | --------- |
+| Chennai Super Kings         | Michael Hussey  | 733       |
+| Chennai Super Kings         | Suresh Raina    | 548       |
+| Chennai Super Kings         | MS Dhoni        | 461       |
+| Kolkata Knight Riders       | Gautam Gambhir  | 486       |
+| Kolkata Knight Riders       | Jacques Kallis  | 311       |
+| Kolkata Knight Riders       | Manvinder Bisla | 230       |
+| Mumbai Indians              | Rohit Sharma    | 538       |
+| Mumbai Indians              | Dinesh Karthik  | 510       |
+| Mumbai Indians              | Kieron Pollard  | 420       |
+| Rajasthan Royals            | Ajinkya Rahane  | 560       |
+| Rajasthan Royals            | Shane Watson    | 543       |
+| Rajasthan Royals            | Sanju Samson    | 350       |
+| Royal Challengers Bangalore | Chris Gayle     | 708       |
+| Royal Challengers Bangalore | Virat Kohli     | 634       |
+| Royal Challengers Bangalore | AB de Villiers  | 360       |
+| Sunrisers Hyderabad         | Shikhar Dhawan  | 475       |
+| Sunrisers Hyderabad         | Cameron White   | 350       |
+| Sunrisers Hyderabad         | Darren Sammy    | 180       |
 
 
+## 13.Find players whose strike rate (Runs/Balls) in a match > 150
+```sql
+SELECT
+ P.PlayerName, 
+ I.MatchID,
+ I.RunsScored, 
+ I.BallsFaced,
+round((I.RunsScored / I.BallsFaced)*100,2) AS Strike_Rate
+FROM IndividualScores I
+JOIN Players P ON I.PlayerID = P.PlayerID
+WHERE (I.RunsScored / I.BallsFaced)*100 > 150;
+```
+## Output:
+
+
+| PlayerName     | MatchID | RunsScored | BallsFaced | Strike\_Rate |
+| -------------- | ------- | ---------- | ---------- | ------------ |
+| Rohit Sharma   | 401     | 75         | 49         | 153.06       |
+| Ajinkya Rahane | 402     | 80         | 52         | 153.85       |
+| Amit Mishra    | 402     | 10         | 6          | 166.67       |
+| Chris Gayle    | 403     | 90         | 54         | 166.67       |
+| Virat Kohli    | 403     | 70         | 45         | 155.56       |
+| Gautam Gambhir | 403     | 50         | 33         | 151.52       |
+| Rohit Sharma   | 410     | 88         | 52         | 169.23       |
+
+
+## 14.Find best bowler (min economy rate = Runs conceded / Overs)
+```sql
+SELECT
+ P.PlayerName, 
+ I.MatchID,
+(I.RunsScored / NULLIF(I.OversBowled,0)) AS Economy
+FROM IndividualScores I
+JOIN Players P ON I.PlayerID = P.PlayerID
+WHERE I.OversBowled > 0
+ORDER BY Economy ASC
+LIMIT 5;
+```
+## Output:
+| PlayerName       | MatchID | Economy |
+| ---------------- | ------- | ------- |
+| Lasith Malinga   | 401     | 1.25    |
+| James Faulkner   | 402     | 1.25    |
+| Lasith Malinga   | 410     | 1.25    |
+| Mitchell Johnson | 401     | 2.50    |
+| Amit Mishra      | 402     | 2.50    |
+
+## 15.CTE to calculate teamwise average runs per player
+```sql
+WITH TeamRuns AS (
+    SELECT 
+    T.TeamName,
+    AVG(TS.TotalRuns) AS AvgRuns
+    FROM TotalScores TS
+    JOIN Players P ON TS.PlayerID = P.PlayerID
+    JOIN Teams T ON P.TeamID = T.TeamID
+    GROUP BY T.TeamName
+)
+SELECT * FROM TeamRuns;
+```
+
+## Output:
+
+| TeamName                    | AvgRuns |
+| --------------------------- | ------- |
+| Chennai Super Kings         | 450.80  |
+| Mumbai Indians              | 298.60  |
+| Rajasthan Royals            | 369.60  |
+| Sunrisers Hyderabad         | 213.00  |
+| Royal Challengers Bangalore | 345.40  |
+| Kolkata Knight Riders       | 248.40  |
+
+
+
+## 16.Players with more than 500 runs but less than 10 wickets
+```sql
+SELECT PlayerName,
+ TotalRuns,
+ TotalWickets
+FROM TotalScores TS
+JOIN Players P ON TS.PlayerID = P.PlayerID
+WHERE TotalRuns > 500 AND TotalWickets < 10;
+```
+
+## Output
+| PlayerName     | TotalRuns | TotalWickets |
+| -------------- | --------- | ------------ |
+| Michael Hussey | 733       | 0            |
+| Suresh Raina   | 548       | 0            |
+| Rohit Sharma   | 538       | 0            |
+| Dinesh Karthik | 510       | 0            |
+| Ajinkya Rahane | 560       | 0            |
+| Chris Gayle    | 708       | 0            |
+| Virat Kohli    | 634       | 0            |
+
+## 17.Find top 5 youngest players by runs
+```sql
+SELECT
+ PlayerName, 
+ Age, 
+ TotalRuns
+FROM TotalScores TS
+JOIN Players P ON TS.PlayerID = P.PlayerID
+ORDER BY Age ASC, TotalRuns DESC
+LIMIT 5;
+```
+## Output;
+
+| PlayerName      | Age | TotalRuns |
+| --------------- | --- | --------- |
+| Sanju Samson    | 19  | 350       |
+| James Faulkner  | 23  | 110       |
+| Virat Kohli     | 24  | 634       |
+| Ajinkya Rahane  | 25  | 560       |
+| Ravindra Jadeja | 25  | 200       |
+
+
+## 18.Find players who performed best in finals (MatchID = 410)
+```sql
+SELECT
+P.PlayerName,
+I.RunsScored, 
+I.WicketsTaken
+FROM IndividualScores I
+JOIN Players P ON I.PlayerID = P.PlayerID
+WHERE I.MatchID = 410
+ORDER BY I.RunsScored DESC, I.WicketsTaken DESC;
+```
+## Output:
+
+| PlayerName     | RunsScored | WicketsTaken |
+| -------------- | ---------- | ------------ |
+| Rohit Sharma   | 88         | 0            |
+| Michael Hussey | 60         | 0            |
+| MS Dhoni       | 45         | 0            |
+| Dinesh Karthik | 40         | 0            |
+| Lasith Malinga | 5          | 2            |
+
+## 19.Find teams with win percentage
+```sql
+SELECT T.TeamName,
+       COUNT(CASE WHEN M.WinnerTeamID = T.TeamID THEN 1 END) AS Wins,
+       COUNT(M.MatchID) AS Matches,
+       round((COUNT(CASE WHEN M.WinnerTeamID = T.TeamID THEN 1 END) * 100.0 / COUNT(M.MatchID)),2)AS WinPercentage
+FROM Teams T
+JOIN Matches M ON T.TeamID = M.Team1ID OR T.TeamID = M.Team2ID
+GROUP BY T.TeamName;
+```
+
+## Output
+
+| TeamName                    | Wins | Matches | WinPercentage |
+| --------------------------- | ---- | ------- | ------------- |
+| Chennai Super Kings         | 1    | 4       | 25.00         |
+| Mumbai Indians              | 4    | 4       | 100.00        |
+| Rajasthan Royals            | 2    | 3       | 66.67         |
+| Sunrisers Hyderabad         | 1    | 3       | 33.33         |
+| Royal Challengers Bangalore | 1    | 3       | 33.33         |
+| Kolkata Knight Riders       | 1    | 3       | 33.33         |
+
+
+
+## 20.Dense rank for players based on wickets
+```sql
+SELECT 
+PlayerName,
+TotalWickets,
+DENSE_RANK() OVER (ORDER BY TotalWickets DESC) AS WicketRank
+FROM TotalScores TS
+JOIN Players P ON TS.PlayerID = P.PlayerID
+WHERE TotalWickets > 0;
+```
+## Output:
+
+| PlayerName       | TotalWickets | WicketRank |
+| ---------------- | ------------ | ---------- |
+| Dwayne Bravo     | 32           | 1          |
+| James Faulkner   | 28           | 2          |
+| Mitchell Johnson | 24           | 3          |
+| Sunil Narine     | 24           | 3          |
+| Lasith Malinga   | 22           | 4          |
+| Amit Mishra      | 21           | 5          |
+| Vinay Kumar      | 20           | 6          |
+| Dale Steyn       | 19           | 7          |
+| Murali Kartik    | 18           | 8          |
+| Ravindra Jadeja  | 15           | 9          |
+| Shane Watson     | 13           | 10         |
+| Kieron Pollard   | 10           | 11         |
+| Darren Sammy     | 10           | 11         |
+| Jacques Kallis   | 10           | 11         |
+
+
+## 21.Find the top 3 players who scored the most total runs.
+```sql
+WITH PlayerRuns AS (
+    SELECT 
+    P.PlayerName, 
+    TS.TotalRuns
+    FROM TotalScores TS
+    JOIN Players P ON TS.PlayerID = P.PlayerID
+)
+SELECT PlayerName, 
+TotalRuns
+FROM PlayerRuns
+ORDER BY TotalRuns DESC
+LIMIT 3;
+```
+## Output:
+| PlayerName     | TotalRuns |
+| -------------- | --------- |
+| Michael Hussey | 733       |
+| Chris Gayle    | 708       |
+| Virat Kohli    | 634       |
+
+
+## 22.Find the average runs scored by players in each team.
+```sql
+WITH TeamAvgRuns AS (
+    SELECT T.TeamName,
+    round(AVG(TS.TotalRuns),2) AS AvgRuns
+    FROM TotalScores TS
+    JOIN Players P ON TS.PlayerID = P.PlayerID
+    JOIN Teams T ON P.TeamID = T.TeamID
+    GROUP BY T.TeamName
+)
+SELECT TeamName, AvgRuns
+FROM TeamAvgRuns
+ORDER BY AvgRuns DESC;
+```
+## Output:
+| TeamName                    | AvgRuns |
+| --------------------------- | ------- |
+| Chennai Super Kings         | 450.80  |
+| Rajasthan Royals            | 369.60  |
+| Royal Challengers Bangalore | 345.40  |
+| Mumbai Indians              | 298.60  |
+| Kolkata Knight Riders       | 248.40  |
+| Sunrisers Hyderabad         | 213.00  |
+
+
+
+## 23.Find players who scored more runs than the average of their own team.
+```sql
+WITH TeamAvg AS (
+    SELECT 
+    T.TeamID,
+    AVG(TS.TotalRuns) AS TeamAvgRuns
+    FROM TotalScores TS
+    JOIN Players P ON TS.PlayerID = P.PlayerID
+    JOIN Teams T ON P.TeamID = T.TeamID
+    GROUP BY T.TeamID
+)
+SELECT
+P.PlayerName, 
+TS.TotalRuns, 
+T.TeamName
+FROM TotalScores TS
+JOIN Players P ON TS.PlayerID = P.PlayerID
+JOIN Teams T ON P.TeamID = T.TeamID
+JOIN TeamAvg TA ON T.TeamID = TA.TeamID
+WHERE TS.TotalRuns > TA.TeamAvgRuns;
+```
+## Output:
+
+| Player Name    | Total Runs | Team Name                   |
+| -------------- | ---------- | --------------------------- |
+| Michael Hussey | 733        | Chennai Super Kings         |
+| Suresh Raina   | 548        | Chennai Super Kings         |
+| MS Dhoni       | 461        | Chennai Super Kings         |
+| Rohit Sharma   | 538        | Mumbai Indians              |
+| Dinesh Karthik | 510        | Mumbai Indians              |
+| Kieron Pollard | 420        | Mumbai Indians              |
+| Ajinkya Rahane | 560        | Rajasthan Royals            |
+| Shane Watson   | 543        | Rajasthan Royals            |
+| Shikhar Dhawan | 475        | Sunrisers Hyderabad         |
+| Cameron White  | 350        | Sunrisers Hyderabad         |
+| Chris Gayle    | 708        | Royal Challengers Bangalore |
+| Virat Kohli    | 634        | Royal Challengers Bangalore |
+| AB de Villiers | 360        | Royal Challengers Bangalore |
+| Gautam Gambhir | 486        | Kolkata Knight Riders       |
+| Jacques Kallis | 311        | Kolkata Knight Riders       |
+
+
+## 24.Find the highest wicket-taking player from each team.
+```sql
+WITH RankedWickets AS (
+    SELECT
+    P.PlayerName,
+    T.TeamName, 
+    TS.TotalWickets,
+	ROW_NUMBER() OVER (PARTITION BY T.TeamName ORDER BY TS.TotalWickets DESC) AS rnk
+    FROM TotalScores TS
+    JOIN Players P ON TS.PlayerID = P.PlayerID
+    JOIN Teams T ON P.TeamID = T.TeamID
+)
+SELECT PlayerName, 
+TeamName, TotalWickets
+FROM RankedWickets
+WHERE rnk = 1;
+```
+## Output:
+
+| Player Name      | Team Name                   | Total Wickets |
+| ---------------- | --------------------------- | ------------- |
+| Dwayne Bravo     | Chennai Super Kings         | 32            |
+| Sunil Narine     | Kolkata Knight Riders       | 24            |
+| Mitchell Johnson | Mumbai Indians              | 24            |
+| James Faulkner   | Rajasthan Royals            | 28            |
+| Vinay Kumar      | Royal Challengers Bangalore | 20            |
+| Amit Mishra      | Sunrisers Hyderabad         | 21            |
+
+
+## 25.Show each team’s total runs and total wickets together.
+```sql
+WITH TeamPerformance AS (
+    SELECT
+    T.TeamName,
+    SUM(TS.TotalRuns) AS TeamRuns, 
+    SUM(TS.TotalWickets) AS TeamWickets
+    FROM TotalScores TS
+    JOIN Players P ON TS.PlayerID = P.PlayerID
+    JOIN Teams T ON P.TeamID = T.TeamID
+    GROUP BY T.TeamName
+)
+SELECT
+ TeamName, 
+ TeamRuns, 
+TeamWickets
+FROM TeamPerformance
+ORDER BY TeamRuns DESC, TeamWickets DESC;
+```
+## Output:
+
+| Team Name                   | Total Runs | Total Wickets |
+| --------------------------- | ---------- | ------------- |
+| Chennai Super Kings         | 2254       | 47            |
+| Rajasthan Royals            | 1848       | 41            |
+| Royal Challengers Bangalore | 1727       | 38            |
+| Mumbai Indians              | 1493       | 56            |
+| Kolkata Knight Riders       | 1242       | 34            |
+| Sunrisers Hyderabad         | 1065       | 50            |
 
